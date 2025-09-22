@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AuthServices.Data.Entities
 {
@@ -11,5 +12,7 @@ namespace AuthServices.Data.Entities
         [Required]
         [ProtectedPersonalData]
         public string LastName { get; set; } = null!;
+
+        
     }
 }
