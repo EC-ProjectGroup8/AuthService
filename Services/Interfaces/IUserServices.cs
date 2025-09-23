@@ -1,13 +1,15 @@
-﻿using AuthServices.Data.Entities;
+﻿using AuthServices.Data.Dto;
+using AuthServices.Data.Entities;
+using AuthServices.Models;
 
 namespace AuthServices.Services.Interfaces
 {
     public interface IUserServices
     {
-        Task<bool> CreateUser(UsersEntity entity);
+        Task<bool> CreateUser(RegisterDto model);
+        Task<UserReturnData?> GetUserById(string id);
+        Task<IEnumerable<UserReturnData>> GetAllUsers();
         Task<bool> DeleteUser(string id);
-        Task<List<UsersEntity>> GetAllUsers();
-        Task<UsersEntity?> GetUserById(string id);
         Task<bool> UpdateUser(UsersEntity entity);
     }
 }
