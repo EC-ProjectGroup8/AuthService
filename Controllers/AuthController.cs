@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
     }
 
 
-    [HttpPost("register")]
+  [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto model)
     {
         if (!ModelState.IsValid)
@@ -35,15 +35,18 @@ public class AuthController : ControllerBase
                 Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
+        var emailIsAvailable = await _userServices.CheckUserByEmail(model.Email);
+        if (!emailIsAvailable)
+            return Conflict("Email is already in use.");
+
         if (model.Password != model.ConfirmPassword)
-            return BadRequest("Passwords do not match");
+            return BadRequest();
 
-        var result = await _userServices.CreateUser(model);
+        var created = await _userServices.CreateUser(model);
 
-        if (result == true)
-            return Ok("User registered successfully!");
-
-        return BadRequest();
+        return created
+             ? Ok("User registered successfully!")
+             : BadRequest("Failed to register user");
     }
 
     [HttpPost("signin")]
