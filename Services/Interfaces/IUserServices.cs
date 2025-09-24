@@ -8,9 +8,10 @@ namespace AuthServices.Services.Interfaces
     {
         Task<bool> CreateUser(RegisterDto model);
         Task<UserReturnData?> GetUserById(string id);
-        Task<bool> GetUserByEmail(string email);
         Task<IEnumerable<UserReturnData>> GetAllUsers();
         Task<bool> DeleteUser(string id);
         Task<bool> UpdateUser(UsersEntity entity);
+        Task<UsersEntity?> GetUserByEmail(string email);
+        Task<bool> CheckUserByEmail(string email);
     }
 }

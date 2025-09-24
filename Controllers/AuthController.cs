@@ -56,15 +56,14 @@ public class AuthController : ControllerBase
                 Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-        if (result.Succeeded)
-        {
-            return Ok("User signed in successfully!");
-        }
-        else
-        {
+        var user = await _userServices.GetUserByEmail(model.Email);
+        if (user == null)
             return Unauthorized("Invalid login attempt.");
-        }
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+        return result.Succeeded
+             ? Ok(user.Email)
+             : BadRequest();
     }
 
     [HttpPost("signout")]

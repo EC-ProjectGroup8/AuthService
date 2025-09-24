@@ -54,12 +54,21 @@ namespace AuthServices.Services
 
         }
 
-        public async Task<bool> GetUserByEmail(string email)
+        public async Task<bool> CheckUserByEmail(string email)
         {
             if (string.IsNullOrEmpty(email)) return false;
             var result = await _userManager.FindByEmailAsync(email);
             return result != null;
         }
+
+        public async Task<UsersEntity?> GetUserByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return null;
+
+            var user = await _userManager.FindByEmailAsync(email);
+            return user;
+        }
+
 
         public async Task<IEnumerable<UserReturnData>> GetAllUsers()
         {
