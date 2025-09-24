@@ -13,14 +13,17 @@ public class AuthController : ControllerBase
 {
     //private readonly UserManager<UsersEntity> _userManager;
     private readonly IUserServices _userServices;
+    private readonly SignInManager<UsersEntity> _signInManager;
 
-    public AuthController(IUserServices userServices)
+    public AuthController(IUserServices userServices, SignInManager<UsersEntity> signInManager)
 
     //UserManager<UsersEntity> userManager,
     {
         _userServices = userServices;
+        _signInManager = signInManager;
         //_userManager = userManager;
     }
+
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto model)
@@ -41,6 +44,34 @@ public class AuthController : ControllerBase
             return Ok("User registered successfully!");
 
         return BadRequest();
+    }
+
+    [HttpPost("signin")]
+    public async Task<IActionResult> SignIn([FromBody] SignInData model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new
+            {
+                Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+            });
+        }
+        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+        if (result.Succeeded)
+        {
+            return Ok("User signed in successfully!");
+        }
+        else
+        {
+            return Unauthorized("Invalid login attempt.");
+        }
+    }
+
+    [HttpPost("signout")]
+    public async Task<IActionResult> Signout()
+    {
+        await _signInManager.SignOutAsync();
+        return Ok("User signed out successfully!");
     }
 
 
