@@ -84,6 +84,14 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
+    [HttpGet("GetUserByEmail/{email}")]
+    public async Task<ActionResult<bool>> GetUserByEmail(string email)
+    {
+        if (string.IsNullOrEmpty(email)) return BadRequest();
+        var result = await _userServices.GetUserByEmail(email);
+        return Ok(result);
+    }
+
 
 
     [HttpGet("GetAllUsers")]

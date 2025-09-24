@@ -54,6 +54,13 @@ namespace AuthServices.Services
 
         }
 
+        public async Task<bool> GetUserByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return false;
+            var result = await _userManager.FindByEmailAsync(email);
+            return result != null;
+        }
+
         public async Task<IEnumerable<UserReturnData>> GetAllUsers()
         {
             return await _userManager.Users
