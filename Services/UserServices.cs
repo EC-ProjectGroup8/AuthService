@@ -4,6 +4,7 @@ using AuthServices.Data.Entities;
 using AuthServices.Data.Interfaces;
 using AuthServices.Models;
 using AuthServices.Services.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,11 +55,11 @@ namespace AuthServices.Services
 
         }
 
-        public async Task<bool> CheckUserByEmail(string email)
+        public async Task<bool> UserExistsByEmailAsync(string email)
         {
-            if (string.IsNullOrEmpty(email)) return false;
-            var result = await _userManager.FindByEmailAsync(email);
-            return result != null;
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            var user = await _userManager.FindByEmailAsync(email.Trim());
+            return user != null;
         }
 
         public async Task<UsersEntity?> GetUserByEmail(string email)

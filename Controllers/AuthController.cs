@@ -1,5 +1,4 @@
-﻿
-using AuthServices.Data.Dto;
+﻿using AuthServices.Data.Dto;
 using AuthServices.Data.Entities;
 using AuthServices.Models;
 using AuthServices.Services;
@@ -7,25 +6,17 @@ using AuthServices.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+namespace AuthServices.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IUserServices userServices, SignInManager<UsersEntity> signInManager) : ControllerBase
 {
     //private readonly UserManager<UsersEntity> _userManager;
-    private readonly IUserServices _userServices;
-    private readonly SignInManager<UsersEntity> _signInManager;
+    private readonly IUserServices _userServices = userServices;
+    private readonly SignInManager<UsersEntity> _signInManager = signInManager;
 
-    public AuthController(IUserServices userServices, SignInManager<UsersEntity> signInManager)
-
-    //UserManager<UsersEntity> userManager,
-    {
-        _userServices = userServices;
-        _signInManager = signInManager;
-        //_userManager = userManager;
-    }
-
-
-  [HttpPost("register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto model)
     {
         if (!ModelState.IsValid)
@@ -35,8 +26,9 @@ public class AuthController : ControllerBase
                 Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
-        var emailIsAvailable = await _userServices.CheckUserByEmail(model.Email);
-        if (!emailIsAvailable)
+
+        var exists = await _userServices.UserExistsByEmailAsync(model.Email);
+        if (exists)
             return Conflict("Email is already in use.");
 
         if (model.Password != model.ConfirmPassword)
@@ -106,7 +98,7 @@ public class AuthController : ControllerBase
 
 
     [HttpPut("Update")]
-       public async Task<ActionResult<bool>> UpdateUser(UsersEntity user)
+    public async Task<ActionResult<bool>> UpdateUser(UsersEntity user)
     {
         if (!ModelState.IsValid)
         {
@@ -115,7 +107,7 @@ public class AuthController : ControllerBase
                 Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
             });
         }
-       var result  = await _userServices.UpdateUser(user);
+        var result = await _userServices.UpdateUser(user);
         return Ok(result);
         //if (result == true) return result("User updated succesfully");
     }
@@ -125,7 +117,7 @@ public class AuthController : ControllerBase
     [HttpDelete("Delete")]
     public async Task<ActionResult<bool>> DeleteUser(string Id)
     {
-        if (Id == null) 
+        if (Id == null)
             return BadRequest();
 
         return await _userServices.DeleteUser(Id);
@@ -133,4 +125,3 @@ public class AuthController : ControllerBase
 
 
 }
-   

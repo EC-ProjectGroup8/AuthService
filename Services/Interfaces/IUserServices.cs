@@ -12,6 +12,6 @@ namespace AuthServices.Services.Interfaces
         Task<bool> DeleteUser(string id);
         Task<bool> UpdateUser(UsersEntity entity);
         Task<UsersEntity?> GetUserByEmail(string email);
-        Task<bool> CheckUserByEmail(string email);
+        Task<bool> UserExistsByEmailAsync(string email);
     }
 }
