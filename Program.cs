@@ -6,7 +6,6 @@ using AuthServices.Services;
 using AuthServices.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,13 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+builder.Services.AddHttpClient("EmailServiceProvider", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["EmailServiceApi"]!);
+});
 
 builder.Services.AddIdentity<UsersEntity, IdentityRole>(x =>
 {
@@ -33,6 +38,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
+{
+    o.TokenLifespan = TimeSpan.FromHours(2);
+});
 
 builder.Services.AddSwaggerGen();
 
@@ -42,16 +51,13 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Service API v1");
+        c.RoutePrefix = string.Empty;
+    });
 }
-
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Service API v1");
-    c.RoutePrefix = string.Empty; 
-});
 
 app.UseHttpsRedirection();
 app.UseCors();
