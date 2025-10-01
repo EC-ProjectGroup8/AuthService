@@ -118,7 +118,7 @@ public class UserService(IUserRepository repository, UserManager<UsersEntity> us
             {
                 var baseUrl = "https://gentle-sky-07e989710.2.azurestaticapps.net/";
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var url = $"{baseUrl}/reset-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+                var url = $"{baseUrl}/glomt-losenord?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
                 await _emailSender.SendResetLinkAsync(email, url);
                 return;
             }
